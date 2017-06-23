@@ -84,6 +84,9 @@ public class DefaultInstanceManager implements InstanceManager {
     private final Map<String, String> preDestroyMethods;
 
     public DefaultInstanceManager(Context context, Map<String, Map<String, String>> injectionMap, org.apache.catalina.Context catalinaContext, ClassLoader containerClassLoader) {
+        /**
+         * classLoader为WebappClassLoader
+         */
         classLoader = catalinaContext.getLoader().getClassLoader();
         privileged = catalinaContext.getPrivileged();
         this.containerClassLoader = containerClassLoader;
@@ -134,6 +137,7 @@ public class DefaultInstanceManager implements InstanceManager {
 
     @Override
     public Object newInstance(String className) throws IllegalAccessException, InvocationTargetException, NamingException, InstantiationException, ClassNotFoundException {
+        System.out.println(className);
         Class<?> clazz = loadClassMaybePrivileged(className, classLoader);
         return newInstance(clazz.newInstance(), clazz);
     }
@@ -518,6 +522,9 @@ public class DefaultInstanceManager implements InstanceManager {
         }
         try {
             Class<?> clazz = containerClassLoader.loadClass(className);
+            /**
+             * 判断clazz是否是ContainerServlet的实现类
+             */
             if (ContainerServlet.class.isAssignableFrom(clazz)) {
                 return clazz;
             }

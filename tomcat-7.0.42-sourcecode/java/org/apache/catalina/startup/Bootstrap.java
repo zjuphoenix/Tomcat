@@ -91,6 +91,7 @@ public final class Bootstrap {
             commonLoader = createClassLoader("common", null);
             if( commonLoader == null ) {
                 // no config file, default to this loader - we might be in a 'single' env.
+                //commonLoader为AppClassLoader
                 commonLoader=this.getClass().getClassLoader();
             }
             catalinaLoader = createClassLoader("server", commonLoader);
@@ -220,6 +221,20 @@ public final class Bootstrap {
         throws Exception
     {
 
+        /**
+         * tomcat目录如下：
+         *      bin (运行脚本）
+         *      conf (配置文件）
+         *      lib (核心库文件）
+         *      logs (日志目录)
+         *      temp (临时目录)
+         *      webapps (自动装载的应用程序的目录）
+         *      work (JVM临时文件目录[java.io.tmpdir])
+         *
+         *  针对多个tomcat实例，bin和lib是共有的，catalina.home指向bin和lib的父目录，
+         *  conf、logs、temp、webapps、work为私有的，catalina.base指向conf、logs、temp、webapps、work的父目录。
+         *  仅运行一个tomcat实例时，catalina.home和catalina.base的位置是相同的。
+         */
         // Set Catalina path
         setCatalinaHome();
         setCatalinaBase();

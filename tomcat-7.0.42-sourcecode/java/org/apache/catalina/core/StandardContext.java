@@ -5052,7 +5052,10 @@ public class StandardContext extends ContainerBase
                     (isAllowLinking());
             }
             if (webappResources instanceof BaseDirContext) {
-                ((BaseDirContext) webappResources).setDocBase(getBasePath());
+             /**
+              * getBasePath()是应用部署的war包全路径
+              */
+             ((BaseDirContext) webappResources).setDocBase(getBasePath());
                 ((BaseDirContext) webappResources).setCached
                     (isCachingAllowed());
                 ((BaseDirContext) webappResources).setCacheTTL(getCacheTTL());
@@ -5223,7 +5226,10 @@ public class StandardContext extends ContainerBase
             try {
                 if ((getDocBase() != null) && (getDocBase().endsWith(".war")) &&
                         (!(new File(getBasePath())).isDirectory()))
-                    setResources(new WARDirContext());
+                /**
+                 * 设置war包
+                 */
+                 setResources(new WARDirContext());
                 else
                     setResources(new FileDirContext());
             } catch (IllegalArgumentException e) {

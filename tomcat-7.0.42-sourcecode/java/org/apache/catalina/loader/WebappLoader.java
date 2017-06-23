@@ -579,7 +579,9 @@ public class WebappLoader extends LifecycleMBeanBase
 
         // Construct a class loader based on our current repositories list
         try {
-
+            /**
+             * 创建WebappClassLoader，并设置资源(war)
+             */
             classLoader = createClassLoader();
             classLoader.setResources(container.getResources());
             classLoader.setDelegate(this.delegate);
@@ -602,6 +604,7 @@ public class WebappLoader extends LifecycleMBeanBase
             }
 
             // Configure our repositories
+            //设置WEB-INF/classes和WEB-INF/lib
             setRepositories();
             setClassPath();
 
@@ -882,7 +885,7 @@ public class WebappLoader extends LifecycleMBeanBase
                 servletContext.getRealPath(classesPath);
 
             if (absoluteClassesPath != null) {
-
+                // /WEB-INF/classes的绝对路径文件
                 classRepository = new File(absoluteClassesPath);
 
             } else {
@@ -906,6 +909,9 @@ public class WebappLoader extends LifecycleMBeanBase
 
 
             // Adding the repository to the class loader
+            /**
+             * 设置repository名(/WEB-INF/classes/)和其文件
+             */
             classLoader.addRepository(classesPath + "/", classRepository);
             loaderRepositories.add(classesPath + "/" );
 
@@ -956,6 +962,9 @@ public class WebappLoader extends LifecycleMBeanBase
                 ioe.initCause(e);
                 throw ioe;
             }
+            /**
+             * 遍历/WEB-INF/lib/下的所有jar文件
+             */
             while (enumeration.hasMoreElements()) {
                 NameClassPair ncPair = enumeration.nextElement();
                 String filename = libPath + "/" + ncPair.getName();
@@ -1000,6 +1009,9 @@ public class WebappLoader extends LifecycleMBeanBase
 
                 try {
                     JarFile jarFile = new JarFile(destFile);
+                    /**
+                     * 为WebappClassLoader添加jar
+                     */
                     classLoader.addJar(filename, jarFile, destFile);
                 } catch (Exception ex) {
                     // Catch the exception if there is an empty jar file

@@ -165,6 +165,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
     /**
      * The child Containers belonging to this Container, keyed by name.
+     * 1个host可以有多个子容器
      */
     protected HashMap<String, Container> children =
         new HashMap<String, Container>();

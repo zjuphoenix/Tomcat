@@ -662,6 +662,7 @@ public class WebappClassLoader
 
     /**
      * Change the Jar path.
+     * /WEB-INF/lib
      */
     public void setJarPath(String jarPath) {
 
@@ -850,6 +851,15 @@ public class WebappClassLoader
         if (repository == null)
             return;
 
+        /*..............*/
+        System.out.println("repository:"+repository);
+        System.out.println("file:"+file.getAbsolutePath());
+        /*..............*/
+        /**
+         * repository:/WEB-INF/classes/
+         * file:/Users/cangxing/Documents/Study/tomcat/Tomcat/tomcat-7.0.42-sourcecode/webapps/web/WEB-INF/classes
+         */
+
         if (log.isDebugEnabled())
             log.debug("addRepository(" + repository + ")");
 
@@ -883,6 +893,18 @@ public class WebappClassLoader
             return;
         if (file == null)
             return;
+
+        /*..............*/
+        System.out.println("jar:"+jar);
+        System.out.println("jarFile:"+jarFile.getName());
+        System.out.println("file:"+file.getAbsolutePath());
+        /*..............*/
+
+        /**
+         * jar:/WEB-INF/lib/servlet-api-2.5.jar
+         * jarFile:/Users/cangxing/Documents/Study/tomcat/Tomcat/tomcat-7.0.42-sourcecode/webapps/web/WEB-INF/lib/servlet-api-2.5.jar
+         * file:/Users/cangxing/Documents/Study/tomcat/Tomcat/tomcat-7.0.42-sourcecode/webapps/web/WEB-INF/lib/servlet-api-2.5.jar
+         */
 
         if (log.isDebugEnabled())
             log.debug("addJar(" + jar + ")");
@@ -1921,6 +1943,9 @@ public class WebappClassLoader
         }
 
         notFoundResources.clear();
+        /**
+         * 清理缓存的加载的类
+         */
         resourceEntries.clear();
         resources = null;
         repositories = null;
@@ -2901,6 +2926,33 @@ public class WebappClassLoader
                         sm.getString("webappClassLoader.wrongVersion",
                                 name));
             }
+            /**
+             * 加载完某个类后把该类的二进制字节数组等信息置为null，帮助gc，只保留class
+             */
+            /*.........*/
+            /*System.out.println("class:"+clazz.getName());
+            System.out.println(entry.source);
+            System.out.println(entry.codeBase);
+            System.out.println(entry.manifest);
+            System.out.println(entry.certificates);*/
+            /*.........*/
+            /**
+             * 对于WEB-INF/classes/下的类
+             * class:com.meili.inc.tomcat.web.HelloController
+             * entry.source:file:/Users/cangxing/Documents/Study/tomcat/Tomcat/tomcat-7.0.42-sourcecode/webapps/web/WEB-INF/classes/com/meili/inc/tomcat/web/HelloController.class
+             * entry.codeBase:file:/Users/cangxing/Documents/Study/tomcat/Tomcat/tomcat-7.0.42-sourcecode/webapps/web/WEB-INF/classes/com/meili/inc/tomcat/web/HelloController.class
+             */
+            /**
+             * 对于WEB-INF/lib/下的jar中的类
+             * class:org.springframework.web.servlet.DispatcherServlet$1
+             * entry.source:jar:file:/Users/cangxing/Documents/Study/tomcat/Tomcat/tomcat-7.0.42-sourcecode/webapps/web/WEB-INF/lib/spring-webmvc-4.0.2.RELEASE.jar!/org/springframework/web/servlet/DispatcherServlet$1.class
+             * entry.codeBase:file:/Users/cangxing/Documents/Study/tomcat/Tomcat/tomcat-7.0.42-sourcecode/webapps/web/WEB-INF/lib/spring-webmvc-4.0.2.RELEASE.jar
+             */
+            /**
+             * class:org.springframework.web.util.WebUtils
+             * entry.source:jar:file:/Users/cangxing/Documents/Study/tomcat/Tomcat/tomcat-7.0.42-sourcecode/webapps/web/WEB-INF/lib/spring-web-4.0.2.RELEASE.jar!/org/springframework/web/util/WebUtils.class
+             * entry.codeBase:file:/Users/cangxing/Documents/Study/tomcat/Tomcat/tomcat-7.0.42-sourcecode/webapps/web/WEB-INF/lib/spring-web-4.0.2.RELEASE.jar
+             */
             entry.loadedClass = clazz;
             entry.binaryContent = null;
             entry.source = null;
@@ -2932,11 +2984,17 @@ public class WebappClassLoader
 
     /**
      * Find specified resource in local repositories.
+     * 在WEB-INF/classes/和WEB-INF/lib/*.jar中搜索
      *
      * @return the loaded resource, or null if the resource isn't found
      */
     protected ResourceEntry findResourceInternal(String name, String path) {
 
+        /**
+         * 以加载WEB-INF/classes/下的com.springframework.cglib.core.ReflectUtils类为例，
+         * name为com.springframework.cglib.core.ReflectUtils，
+         * path为com/springframework/cglib/core/ReflectUtils.class
+         */
         if (!started) {
             log.info(sm.getString("webappClassLoader.stopped", name));
             return null;
@@ -2962,6 +3020,9 @@ public class WebappClassLoader
 
         boolean fileNeedConvert = false;
 
+        /**
+         * 在repositories中查找该类，一般情况下repositories只包含/WEB-INF/classes/这1个
+         */
         for (i = 0; (entry == null) && (i < repositoriesLength); i++) {
             try {
 
@@ -3196,6 +3257,9 @@ public class WebappClassLoader
                             return null;
                         }
                     }
+                    /**
+                     * 类的二进制字节数组
+                     */
                     entry.binaryContent = binaryContent;
 
                     // The certificates are only available after the JarEntry
@@ -3221,6 +3285,9 @@ public class WebappClassLoader
             // instance
             ResourceEntry entry2 = resourceEntries.get(name);
             if (entry2 == null) {
+                /**
+                 * 对类进行缓存，下次用到直接返回
+                 */
                 resourceEntries.put(name, entry);
             } else {
                 entry = entry2;
